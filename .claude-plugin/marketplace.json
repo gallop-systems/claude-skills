@@ -7,7 +7,7 @@
   "plugins": [
     {
       "name": "all",
-      "source": ".",
+      "source": "./",
       "description": "All skills: Kysely for PostgreSQL, and more",
       "version": "1.0.0"
     },
