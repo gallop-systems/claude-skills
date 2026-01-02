@@ -1,0 +1,9 @@
+# Test project (not part of plugin)
+kysely-test/
+
+# OS files
+.DS_Store
+
+# Editor
+.idea/
+.vscode/

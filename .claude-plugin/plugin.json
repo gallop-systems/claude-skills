@@ -1,0 +1,8 @@
+{
+  "name": "aiguide",
+  "description": "Collection of AI-assisted development skills for database and backend work",
+  "version": "1.0.0",
+  "author": {
+    "name": "yeedle"
+  }
+}
