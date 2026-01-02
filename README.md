@@ -7,7 +7,8 @@ A collection of Claude Code skills for the Gallop Systems team.
 In Claude Code, run:
 
 ```
-/plugin install github.com/gallop-systems/claude-skills
+/plugin marketplace add gallop-systems/claude-skills
+/plugin install aiguide@gallop-systems-claude-skills
 ```
 
 The skills will be automatically available in all your Claude Code sessions.
