@@ -1,6 +1,6 @@
 # Claude Skills
 
-A collection of Claude Code skills for the Gallop Systems team.
+A collection of Claude Code skills.
 
 ## Installation
 
