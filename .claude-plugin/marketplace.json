@@ -2,11 +2,11 @@
   "name": "gallop-systems-claude-skills",
   "owner": {
     "name": "Gallop Systems",
-    "email": "dev@gallopsystems.com"
+    "email": "yeedle@gallopsystems.com"
   },
   "plugins": [
     {
-      "name": "aiguide",
+      "name": "skills",
       "source": ".",
       "description": "Collection of AI-assisted development skills including Kysely for PostgreSQL",
       "version": "1.0.0"

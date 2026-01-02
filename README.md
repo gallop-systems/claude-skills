@@ -8,7 +8,7 @@ In Claude Code, run:
 
 ```
 /plugin marketplace add gallop-systems/claude-skills
-/plugin install aiguide@gallop-systems-claude-skills
+/plugin install skills@gallop-systems-claude-skills
 ```
 
 The skills will be automatically available in all your Claude Code sessions.
