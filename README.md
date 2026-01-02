@@ -4,14 +4,20 @@ A collection of Claude Code skills for the Gallop Systems team.
 
 ## Installation
 
-In Claude Code, run:
-
+First, add the marketplace:
 ```
 /plugin marketplace add gallop-systems/claude-skills
-/plugin install skills@gallop-systems-claude-skills
 ```
 
-The skills will be automatically available in all your Claude Code sessions.
+Then install all skills:
+```
+/plugin install all@gallop-systems-claude-skills
+```
+
+Or install individual skills:
+```
+/plugin install kysely-postgres@gallop-systems-claude-skills
+```
 
 ## Available Skills
 

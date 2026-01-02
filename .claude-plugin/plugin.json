@@ -1,6 +1,6 @@
 {
-  "name": "skills",
-  "description": "Collection of AI-assisted development skills for database and backend work",
+  "name": "all",
+  "description": "All skills: Kysely for PostgreSQL, and more",
   "version": "1.0.0",
   "author": {
     "name": "yeedle"

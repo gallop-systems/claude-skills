@@ -6,9 +6,15 @@
   },
   "plugins": [
     {
-      "name": "skills",
+      "name": "all",
       "source": ".",
-      "description": "Collection of AI-assisted development skills including Kysely for PostgreSQL",
+      "description": "All skills: Kysely for PostgreSQL, and more",
+      "version": "1.0.0"
+    },
+    {
+      "name": "kysely-postgres",
+      "source": "./skills/kysely-postgres",
+      "description": "Type-safe Kysely query patterns for PostgreSQL",
       "version": "1.0.0"
     }
   ]
