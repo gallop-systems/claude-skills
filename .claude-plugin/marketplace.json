@@ -8,13 +8,19 @@
     {
       "name": "all",
       "source": "./",
-      "description": "All skills: Kysely for PostgreSQL, and more",
+      "description": "All skills: Kysely for PostgreSQL, Nuxt/Nitro API patterns",
       "version": "1.0.0"
     },
     {
       "name": "kysely-postgres",
       "source": "./skills/kysely-postgres",
       "description": "Type-safe Kysely query patterns for PostgreSQL",
+      "version": "1.0.0"
+    },
+    {
+      "name": "nuxt-nitro-api",
+      "source": "./skills/nuxt-nitro-api",
+      "description": "Nuxt 3 / Nitro API patterns: validation, auth, SSR, tasks, SSE",
       "version": "1.0.0"
     }
   ]

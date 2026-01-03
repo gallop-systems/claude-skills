@@ -1,0 +1,8 @@
+{
+  "name": "nuxt-nitro-api",
+  "description": "Nuxt 3 / Nitro API patterns: validation, auth, SSR, tasks, SSE",
+  "version": "1.0.0",
+  "author": {
+    "name": "yeedle"
+  }
+}

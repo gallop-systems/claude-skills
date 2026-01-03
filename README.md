@@ -17,6 +17,7 @@ Then install all skills:
 Or install individual skills:
 ```
 /plugin install kysely-postgres@gallop-systems-claude-skills
+/plugin install nuxt-nitro-api@gallop-systems-claude-skills
 ```
 
 ## Available Skills
@@ -31,6 +32,23 @@ Covers:
 - JSON/JSONB and array handling
 - String concatenation
 - Common pitfalls to avoid
+
+### nuxt-nitro-api
+
+Nuxt 3 / Nitro API patterns for building type-safe full-stack applications. Automatically activates when working in Nuxt 3 projects.
+
+Covers:
+- Zod validation with h3 (Standard Schema support)
+- useFetch vs $fetch vs useAsyncData
+- Type inference (don't add manual types!)
+- nuxt-auth-utils (OAuth, WebAuthn, middleware)
+- Page structure (keep pages thin)
+- Composables vs utils
+- SSR + localStorage patterns
+- Deep linking (URL params sync)
+- Nitro tasks and job queues
+- Server-Sent Events (SSE)
+- Third-party service integrations
 
 ## Adding New Skills
 
