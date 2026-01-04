@@ -233,6 +233,6 @@ The setup file stubs Nuxt/Nitro auto-imports:
 
 4. **Test file location** - Co-locate with handlers: `handler.ts` → `handler.test.ts`
 
-5. **Separate test database** - Always use a dedicated test DB (`zlm-test`, not `zlm`)
+5. **Separate test database** - Always use a dedicated test DB (`myapp-test`, not `myapp`)
 
 6. **CI needs PostgreSQL service** - See [ci-setup.md](./ci-setup.md) for GitHub Actions config
