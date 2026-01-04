@@ -8,7 +8,7 @@
     {
       "name": "all",
       "source": "./",
-      "description": "All skills: Kysely for PostgreSQL, Nuxt/Nitro API patterns",
+      "description": "All skills: Kysely PostgreSQL, Nuxt/Nitro API, Nitro testing",
       "version": "1.0.0"
     },
     {
@@ -21,6 +21,12 @@
       "name": "nuxt-nitro-api",
       "source": "./skills/nuxt-nitro-api",
       "description": "Nuxt 3 / Nitro API patterns: validation, auth, SSR, tasks, SSE",
+      "version": "1.0.0"
+    },
+    {
+      "name": "nitro-testing",
+      "source": "./skills/nitro-testing",
+      "description": "Test Nitro handlers with real PostgreSQL, transaction rollback, factories",
       "version": "1.0.0"
     }
   ]

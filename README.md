@@ -50,6 +50,19 @@ Covers:
 - Server-Sent Events (SSE)
 - Third-party service integrations
 
+### nitro-testing
+
+Test Nitro API handlers with real PostgreSQL using transaction rollback isolation. Each test runs in a transaction that auto-rolls back for complete isolation without cleanup overhead.
+
+Covers:
+- Transaction rollback pattern (fast, isolated, real SQL)
+- Vitest custom fixtures (`factories`, `db`)
+- Mock event helpers (`mockGet`, `mockPost`, `mockPatch`, `mockDelete`)
+- Factory pattern for test data creation
+- Global stubs for Nuxt auto-imports
+- Async/automation testing utilities
+- CI/CD setup with GitHub Actions and PostgreSQL
+
 ## Adding New Skills
 
 1. Create a new directory under `skills/`
