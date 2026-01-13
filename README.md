@@ -18,7 +18,25 @@ Or install individual skills:
 ```
 /plugin install kysely-postgres@gallop-systems-claude-skills
 /plugin install nuxt-nitro-api@gallop-systems-claude-skills
+/plugin install nitro-testing@gallop-systems-claude-skills
 ```
+
+## Updating
+
+Update all skills to the latest version:
+```
+/plugin update all@gallop-systems-claude-skills
+```
+
+Or update a specific skill:
+```
+/plugin update kysely-postgres@gallop-systems-claude-skills
+```
+
+**Auto-updates:** Third-party marketplaces don't auto-update by default. To enable:
+1. Run `/plugin` and select **Marketplaces**
+2. Choose `gallop-systems-claude-skills`
+3. Select **Enable auto-update**
 
 ## Available Skills
 
