@@ -206,3 +206,55 @@ Needs Nuxt/Vue context (useRuntimeConfig, useRoute, refs)?
 6. **useRouteQuery needs Nuxt composables** - Pass `route` and `router` explicitly.
 7. **Input types aren't auto-generated** - Export Zod schemas for client use.
 8. **Cookie size limit is 4096 bytes** - Store only essential session data.
+9. **Ambiguous routes need type assertion** - See below.
+10. **Never use generic type params with useFetch/$fetch** - See below.
+
+### Ambiguous Route Type Inference
+
+Nuxt generates types in `.nuxt/types/nitro-routes.d.ts` with an `InternalApi` object keyed by route paths. When routes overlap, Nuxt can't infer types from template literals:
+
+```typescript
+// Routes: GET /api/projects and GET /api/projects/:id
+// If route.params.id is "", the path matches BOTH routes
+const { data } = await useFetch(`/api/projects/${route.params.id}`);
+// data type: unknown (ambiguous)
+
+// Fix: Assert the specific route pattern
+const { data } = await useFetch(`/api/projects/${route.params.id}` as '/api/projects/:id');
+// data type: correctly inferred from /api/projects/:id handler
+```
+
+### Extracting Types from useFetch (Never Use Generic Params)
+
+Never pass type parameters to `useFetch` or `$fetch`:
+
+```typescript
+// WRONG - Lies to type checker, breaks when endpoint changes
+const { data } = await useFetch<Project[]>('/api/projects');
+
+// RIGHT - Let Nuxt infer from the actual endpoint
+const { data: projects } = await useFetch('/api/projects');
+```
+
+To use the inferred type elsewhere in your component:
+
+```typescript
+const { data: projects } = await useFetch('/api/projects');
+
+// Get the full ref type (Ref<Project[] | null>)
+type ProjectsRef = typeof projects;
+
+// Get a single item type from an array response
+type Project = NonNullable<typeof projects.value>[number];
+
+// Use in functions/computeds
+function formatProject(project: Project) {
+  return `${project.name} - ${project.status}`;
+}
+
+const activeProjects = computed(() =>
+  projects.value?.filter(p => p.status === 'active') ?? []
+);
+```
+
+This ensures your frontend types stay in sync with your API - if the endpoint return type changes, TypeScript will catch mismatches.

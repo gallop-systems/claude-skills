@@ -837,6 +837,65 @@ Always create indexes on foreign key columns:
 await db.schema.createIndex("idx_order_user_id").on("order").column("user_id").execute();
 ```
 
+### 6. Always Type `sql` Template Literals
+
+When using `sql` template literals, the inferred type is `unknown` since Kysely can't know what the SQL expression resolves to. Always provide an explicit type:
+
+```typescript
+// WRONG - Returns unknown type
+eb.fn.coalesce("some_json_col", sql`'{}'::jsonb`)
+
+// RIGHT - Explicit type annotation
+eb.fn.coalesce("some_json_col", sql<Record<string, unknown>>`'{}'::jsonb`)
+
+// For complex types (e.g., JSON column from a CTE), use typeof with eb.ref
+// This ensures the fallback type matches the column type exactly
+eb.fn
+  .coalesce(
+    eb.ref("jobs_agg.jobs"),
+    sql<typeof eb.ref<"jobs_agg.jobs">>`'[]'::json`
+  )
+  .as("jobs")
+```
+
+**Key rule**: Every `sql` template literal should have a type parameter: `sql<TYPE>`. This ensures proper type inference throughout your query chain.
+
+### 7. DATE Columns Cause Timezone Issues
+
+By default, the `pg` driver converts DATE columns to JavaScript `Date` objects. This causes timezone problems:
+
+```
+Database: 2025-01-01 (just a date, no time)
+JS Date:  2025-01-01T00:00:00.000Z (interpreted as UTC midnight)
+User in NYC sees: Dec 31, 2024 (5 hours behind UTC)
+```
+
+**Solution: Parse DATE as string and let the frontend handle formatting**
+
+Step 1: Configure `pg` to return DATE as string:
+
+```typescript
+import pg from "pg";
+
+// Tell pg to return DATE columns as strings instead of Date objects
+const DATE_OID = 1082;
+pg.types.setTypeParser(DATE_OID, (val: string) => val);
+```
+
+Step 2: Update `kysely-codegen` to generate matching types:
+
+```bash
+npx kysely-codegen \
+  --url="$DATABASE_URL" \
+  --out-file=server/db/db.d.ts \
+  --dialect=postgres \
+  --date-parser=string
+```
+
+Now DATE columns return strings like `"2025-01-01"` and the frontend can parse/format respecting the user's timezone.
+
+**Note**: This applies to DATE columns only. TIMESTAMPTZ columns already handle timezones correctly by storing UTC and converting on read.
+
 ## PostgreSQL Helpers Summary
 
 All helpers from `kysely/helpers/postgres`:

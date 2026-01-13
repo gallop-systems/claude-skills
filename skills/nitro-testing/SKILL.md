@@ -1,28 +1,33 @@
 ---
 name: nitro-testing
-description: Test Nuxt 3 / Nitro API handlers with real PostgreSQL, transaction rollback isolation, and typed factories. No mocks, real SQL.
+description: Test Nuxt 3 / Nitro applications - both API handlers (real PostgreSQL, transaction rollback) and frontend components (@nuxt/test-utils, mountSuspended).
 ---
 
-# Nitro API Testing Patterns
+# Nuxt / Nitro Testing Patterns
 
-Test Nitro API handlers with a real PostgreSQL database using transaction rollback isolation. Each test runs in a transaction that auto-rolls back, providing complete isolation without cleanup overhead.
+Test Nuxt 3 applications end-to-end: API handlers with real PostgreSQL using transaction rollback isolation, and frontend components with @nuxt/test-utils.
 
 ## When to Use This Skill
 
 Use this skill when:
 - Testing Nuxt 3 / Nitro API handlers
+- Testing Vue components, pages, or composables in Nuxt
 - Using Kysely or another query builder with PostgreSQL
 - Need real database testing (not mocks)
 - Want fast, isolated tests without truncation
 
 ## Reference Files
 
+**Backend (API Handlers):**
 - [transaction-rollback.md](./transaction-rollback.md) - Core isolation pattern with Vitest fixtures
 - [test-utils.md](./test-utils.md) - Mock events, stubs, and assertion helpers
 - [factories.md](./factories.md) - Transaction-bound factory pattern
 - [vitest-config.md](./vitest-config.md) - Vitest configuration for Nitro
 - [ci-setup.md](./ci-setup.md) - GitHub Actions with PostgreSQL service
 - [async-testing.md](./async-testing.md) - Testing background tasks and automations
+
+**Frontend (Components/Pages):**
+- [frontend-testing.md](./frontend-testing.md) - Component testing with @nuxt/test-utils
 
 ## Example Files
 
@@ -236,3 +241,257 @@ The setup file stubs Nuxt/Nitro auto-imports:
 5. **Separate test database** - Always use a dedicated test DB (`myapp-test`, not `myapp`)
 
 6. **CI needs PostgreSQL service** - See [ci-setup.md](./ci-setup.md) for GitHub Actions config
+
+---
+
+## Frontend Testing
+
+Test Vue components and pages in Nuxt using `@nuxt/test-utils` with `mountSuspended`.
+
+### Setup
+
+**Dependencies:**
+```bash
+yarn add -D @nuxt/test-utils @vue/test-utils happy-dom
+```
+
+**Vitest Config** - Use environment variable to separate frontend/backend:
+
+```typescript
+// vitest.config.ts
+import { defineConfig } from "vitest/config";
+import { defineVitestConfig } from "@nuxt/test-utils/config";
+
+const isNuxtEnv = process.env.VITEST_ENV === "nuxt";
+
+export default isNuxtEnv
+  ? defineVitestConfig({
+      test: {
+        environment: "nuxt",
+        globals: true,
+        include: [
+          "components/**/*.test.ts",
+          "pages/**/*.test.ts",
+          "utils/**/*.test.ts",
+        ],
+      },
+    })
+  : defineConfig({
+      // ... backend config
+    });
+```
+
+**Package.json scripts:**
+```json
+{
+  "scripts": {
+    "test": "vitest",
+    "test:frontend": "VITEST_ENV=nuxt vitest",
+    "test:frontend:run": "VITEST_ENV=nuxt vitest run"
+  }
+}
+```
+
+**Nuxt test config** (`nuxt.config.test.ts`):
+```typescript
+export default defineNuxtConfig({
+  modules: ["@primevue/nuxt-module"], // Include UI libraries
+  ssr: false, // Disable SSR for simpler component testing
+});
+```
+
+### File Organization
+
+Co-locate tests with source files:
+```
+components/
+  ProjectCard.vue
+  ProjectCard.test.ts
+pages/
+  projects/
+    index.vue
+    index.test.ts
+utils/
+  dates.ts
+  dates.test.ts
+```
+
+### Component Testing Pattern
+
+Use `mountSuspended` for async-safe component mounting:
+
+```typescript
+import { describe, it, expect } from "vitest";
+import { mountSuspended } from "@nuxt/test-utils/runtime";
+import ProjectCard from "./ProjectCard.vue";
+
+describe("ProjectCard", () => {
+  it("renders project name", async () => {
+    const wrapper = await mountSuspended(ProjectCard, {
+      props: {
+        project: { id: 1, name: "Test Project", status: "active" },
+      },
+    });
+
+    expect(wrapper.text()).toContain("Test Project");
+  });
+
+  it("shows active badge when active", async () => {
+    const wrapper = await mountSuspended(ProjectCard, {
+      props: {
+        project: { id: 1, name: "Test", status: "active" },
+      },
+    });
+
+    expect(wrapper.html()).toMatch(/active/i);
+  });
+});
+```
+
+### Mocking Composables
+
+Use `mockNuxtImport` for Nuxt composables:
+
+```typescript
+import { mockNuxtImport } from "@nuxt/test-utils/runtime";
+
+mockNuxtImport("useAddress", () => {
+  return () => ({
+    getDisplayAddress: (project: any) =>
+      project.address || "No address",
+  });
+});
+
+mockNuxtImport("useUserSession", () => {
+  return () => ({
+    user: { id: 1, name: "Test User" },
+    loggedIn: true,
+  });
+});
+```
+
+### Mocking API Endpoints
+
+Use `registerEndpoint` to mock API calls:
+
+```typescript
+import { registerEndpoint } from "@nuxt/test-utils/runtime";
+
+registerEndpoint("/api/projects", {
+  method: "GET",
+  handler: () => [
+    { id: 1, name: "Project A", status: "active" },
+    { id: 2, name: "Project B", status: "completed" },
+  ],
+});
+
+registerEndpoint("/api/projects/:id", {
+  method: "GET",
+  handler: (event) => ({
+    id: parseInt(event.context.params.id),
+    name: "Project Detail",
+  }),
+});
+```
+
+### Testing Pages with Routes
+
+```typescript
+import { describe, it, expect } from "vitest";
+import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime";
+import TaskPage from "./[id].vue";
+
+describe("Task Detail Page", () => {
+  it("renders task details", async () => {
+    registerEndpoint("/api/tasks/123", {
+      method: "GET",
+      handler: () => ({ id: 123, name: "Fix bug", status: "open" }),
+    });
+
+    const wrapper = await mountSuspended(TaskPage, {
+      route: {
+        params: { id: "123" },
+      },
+    });
+
+    expect(wrapper.text()).toContain("Fix bug");
+  });
+});
+```
+
+### Stubbing UI Library Components
+
+For PrimeVue or other UI libraries, stub complex components:
+
+```typescript
+import { mountSuspended } from "@nuxt/test-utils/runtime";
+import ToastService from "primevue/toastservice";
+import ConfirmationService from "primevue/confirmationservice";
+
+const wrapper = await mountSuspended(MyComponent, {
+  global: {
+    plugins: [ToastService, ConfirmationService],
+    stubs: {
+      DataTable: true,
+      Column: true,
+      Dialog: true,
+    },
+  },
+});
+```
+
+### Testing Utility Functions
+
+For pure utilities, standard Vitest patterns work:
+
+```typescript
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { formatDate, parseDate } from "./dates";
+
+describe("date utilities", () => {
+  const originalTZ = process.env.TZ;
+
+  afterEach(() => {
+    process.env.TZ = originalTZ;
+  });
+
+  it("formats date correctly in EST", () => {
+    process.env.TZ = "America/New_York";
+    expect(formatDate("2025-01-15")).toBe("Jan 15, 2025");
+  });
+
+  it("formats date correctly in PST", () => {
+    process.env.TZ = "America/Los_Angeles";
+    expect(formatDate("2025-01-15")).toBe("Jan 15, 2025");
+  });
+});
+```
+
+### Async Handling
+
+```typescript
+import { nextTick } from "vue";
+
+it("updates after user interaction", async () => {
+  const wrapper = await mountSuspended(Counter);
+
+  await wrapper.find("button").trigger("click");
+  await nextTick();
+
+  expect(wrapper.text()).toContain("Count: 1");
+});
+```
+
+### Frontend Testing Gotchas
+
+1. **Use `mountSuspended`** - Not regular `mount`. Handles async setup and Nuxt context.
+
+2. **Mock composables before mounting** - `mockNuxtImport` must be called before `mountSuspended`.
+
+3. **Register endpoints before mounting** - API mocks must exist before the component fetches.
+
+4. **Use `wrapper.text()` for content** - More reliable than searching for specific elements.
+
+5. **Await everything** - `mountSuspended`, `trigger()`, `nextTick()` are all async.
+
+6. **Separate test configs** - Use `VITEST_ENV` to run frontend and backend tests with different environments.
