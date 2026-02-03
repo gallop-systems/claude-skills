@@ -551,6 +551,61 @@ const products = await db
   .execute();
 ```
 
+**Critical: Use explicit `.select()` instead of `.selectAll()` with nested json helpers**
+
+When using `jsonObjectFrom` containing a nested `jsonArrayFrom` (or vice versa), using `selectAll("table")` breaks TypeScript's type inference. The result type becomes `unknown` or loses the nested structure, requiring `$castTo` to fix.
+
+```typescript
+// WRONG - selectAll() breaks type inference for nested json helpers
+const invoice = await db
+  .selectFrom("invoices")
+  .selectAll("invoices")
+  .select((eb) => [
+    jsonObjectFrom(
+      eb
+        .selectFrom("payment_plans")
+        .selectAll()  // ❌ This breaks type inference!
+        .select((eb2) => [
+          jsonArrayFrom(
+            eb2.selectFrom("installments").selectAll()
+              .whereRef("installments.plan_id", "=", "payment_plans.id")
+          ).as("installments"),
+        ])
+        .whereRef("payment_plans.invoice_id", "=", "invoices.id")
+    ).as("payment_plan"),  // Type is unknown or broken
+  ])
+  .executeTakeFirst();
+
+// RIGHT - explicit select() preserves type inference
+const invoice = await db
+  .selectFrom("invoices")
+  .selectAll("invoices")
+  .select((eb) => [
+    jsonObjectFrom(
+      eb
+        .selectFrom("payment_plans")
+        .select([  // ✅ Explicit columns!
+          "payment_plans.id",
+          "payment_plans.invoice_id",
+          "payment_plans.notes",
+          "payment_plans.created_at",
+        ])
+        .select((eb2) => [
+          jsonArrayFrom(
+            eb2.selectFrom("installments").selectAll()
+              .whereRef("installments.plan_id", "=", "payment_plans.id")
+          ).as("installments"),
+        ])
+        .whereRef("payment_plans.invoice_id", "=", "invoices.id")
+    ).as("payment_plan"),  // Type is properly inferred!
+  ])
+  .executeTakeFirst();
+```
+
+**Why this happens**: Kysely's type inference for nested json helpers relies on tracking the selected columns through the query chain. `selectAll()` returns all columns dynamically, which confuses TypeScript when combined with additional `.select()` calls that add nested json helpers. Using explicit column names gives TypeScript the static information it needs.
+
+**Rule of thumb**: When combining `jsonObjectFrom`/`jsonArrayFrom` with nested json helpers, always use explicit `.select([...columns])` instead of `.selectAll()` on the subquery containing the nested helper.
+
 ### Reusable Helpers
 
 Create composable, type-safe helper functions using `Expression<T>`:
