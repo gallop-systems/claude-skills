@@ -1,0 +1,8 @@
+{
+  "name": "setup-permissions",
+  "description": "Set up Claude Code read-only permissions and analyze session history for additional permission suggestions",
+  "version": "1.0.0",
+  "author": {
+    "name": "yeedle"
+  }
+}
