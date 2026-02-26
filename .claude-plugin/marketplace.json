@@ -28,6 +28,12 @@
       "source": "./skills/nitro-testing",
       "description": "Test Nitro handlers with real PostgreSQL, transaction rollback, factories",
       "version": "1.0.0"
+    },
+    {
+      "name": "setup-permissions",
+      "source": "./skills/setup-permissions",
+      "description": "Set up Claude Code read-only permissions and analyze session history",
+      "version": "1.0.0"
     }
   ]
 }
