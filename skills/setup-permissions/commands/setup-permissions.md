@@ -1,7 +1,6 @@
 ---
-name: setup-permissions
 description: Set up Claude Code read-only permissions and analyze session history for additional permission suggestions
-disable-model-invocation: true
+allowed-tools: Read, Edit, Write, Bash(cat:*), Bash(find:*), Bash(python3:*)
 ---
 
 # Setup Permissions
