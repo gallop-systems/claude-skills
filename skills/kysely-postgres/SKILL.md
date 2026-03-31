@@ -285,6 +285,25 @@ Use the callback format when you need:
 .having((eb) => eb.fn.count("id"), ">", 5)
 ```
 
+#### FILTER (WHERE ...) on Aggregates
+
+PostgreSQL's `FILTER (WHERE ...)` clause is available on **all** aggregate function builders via `.filterWhere()`:
+
+```typescript
+.select((eb) => [
+  eb.fn.count("id").filterWhere("status", "=", "active").as("active_count"),
+  eb.fn.countAll().filterWhere("role", "!=", "banned").as("non_banned"),
+  eb.fn.sum("amount").filterWhere("type", "=", "credit").as("total_credits"),
+])
+
+// Also works as the first argument to .having()
+.having(
+  (eb) => eb.fn.countAll().filterWhere("status", "!=", "signed"),
+  "=",
+  0
+)
+```
+
 ### ORDER BY
 
 ```typescript
@@ -852,6 +871,16 @@ Generated types use:
 
 // RIGHT
 .select((eb) => eb.fn.countAll().as("count"))
+
+// WRONG - raw SQL for FILTER (WHERE ...) on aggregates
+.having(sql<number>`count(*) filter (where status != 'signed')`, "=", 0)
+
+// RIGHT - .filterWhere() works on all aggregate function builders
+.having(
+  (eb) => eb.fn.countAll().filterWhere("status", "!=", "signed"),
+  "=",
+  0
+)
 ```
 
 ### 2. Don't Forget .execute()

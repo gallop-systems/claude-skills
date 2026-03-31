@@ -327,6 +327,8 @@ const productsWithReviews = await db
               }),
             })
           )
+          // .filterWhere() is available on ALL aggregate functions (count, sum, avg, etc.),
+          // not just jsonAgg. See aggregations.ts for general usage.
           .filterWhere("review.id", "is not", null) // Filter nulls!
           .as("reviews"),
       ])
@@ -388,4 +390,9 @@ const productsWithReviews = await db
    - Use eb.fn.jsonAgg() (NOT imported from helpers!)
    - Use .filterWhere() to exclude nulls
    - Combine with jsonBuildObject for structured arrays
+
+8. .filterWhere() (PostgreSQL FILTER (WHERE ...)):
+   - Available on ALL aggregate builders, not just jsonAgg
+   - Works on: count, countAll, sum, avg, min, max, jsonAgg
+   - See aggregations.ts for general examples
 */
