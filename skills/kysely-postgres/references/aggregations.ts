@@ -76,6 +76,40 @@ const popularProducts = await db
   .execute();
 
 // ============================================
+// FILTER (WHERE ...) ON AGGREGATES
+// ============================================
+
+// PostgreSQL's FILTER (WHERE ...) clause works on ALL aggregate function builders
+// via .filterWhere(). This is NOT specific to jsonAgg — it works on count, sum, avg, etc.
+
+// Basic usage: conditional counting/summing without CASE expressions
+const filteredAggregates = await db
+  .selectFrom("user")
+  .select((eb) => [
+    eb.fn.count("id").filterWhere("status", "=", "active").as("active_count"),
+    eb.fn.countAll().filterWhere("role", "!=", "banned").as("non_banned"),
+    eb.fn.sum("balance").filterWhere("type", "=", "credit").as("total_credits"),
+    eb.fn.avg("rating").filterWhere("verified", "=", true).as("verified_avg_rating"),
+  ])
+  .executeTakeFirst();
+
+// .filterWhere() also works inside .having() as the first argument
+const groupsWithNoUnsigned = await db
+  .selectFrom("document")
+  .select((eb) => [
+    "group_id",
+    eb.fn.countAll().as("total"),
+    eb.fn.countAll().filterWhere("status", "!=", "signed").as("unsigned_count"),
+  ])
+  .groupBy("group_id")
+  .having(
+    (eb) => eb.fn.countAll().filterWhere("status", "!=", "signed"),
+    "=",
+    0
+  )
+  .execute();
+
+// ============================================
 // AGGREGATE FUNCTIONS REFERENCE
 // ============================================
 
@@ -124,4 +158,10 @@ const productStats = await db
    ])
    .groupBy("groupColumn")
    .having((eb) => eb.fn.count("id"), ">", 5)
+
+5. .filterWhere() - PostgreSQL FILTER (WHERE ...) clause:
+   - Available on ALL aggregate function builders (count, countAll, sum, avg, min, max, jsonAgg)
+   - Replaces CASE WHEN ... inside aggregates for conditional aggregation
+   - Works as the first argument to .having() for filtered aggregate conditions
+   - Example: eb.fn.count("id").filterWhere("status", "=", "active").as("active_count")
 */
