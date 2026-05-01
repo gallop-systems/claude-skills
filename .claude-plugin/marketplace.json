@@ -8,7 +8,7 @@
     {
       "name": "all",
       "source": "./",
-      "description": "All skills: Kysely PostgreSQL, Nuxt/Nitro API, Nitro testing",
+      "description": "All skills: Kysely PostgreSQL, Nuxt/Nitro API, Nitro testing, Linear management",
       "version": "1.0.0"
     },
     {
@@ -33,6 +33,12 @@
       "name": "setup-permissions",
       "source": "./skills/setup-permissions",
       "description": "Set up Claude Code read-only permissions and analyze session history",
+      "version": "1.0.0"
+    },
+    {
+      "name": "linear",
+      "source": "./skills/linear",
+      "description": "Create, triage, and manage Linear issues following Gallop team conventions, with a GraphQL CLI for operations the Linear MCP server doesn't expose",
       "version": "1.0.0"
     }
   ]
