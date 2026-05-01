@@ -1,0 +1,8 @@
+{
+  "name": "linear",
+  "description": "Create, triage, and manage Linear issues at Gallop Systems following team conventions: cycle placement, issue templates, project / milestone hierarchy, project refresh, and cycle rebalance. Includes a bash GraphQL CLI for the operations the Linear MCP server doesn't expose.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Gallop Systems"
+  }
+}
