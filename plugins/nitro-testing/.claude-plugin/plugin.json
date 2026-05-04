@@ -1,0 +1,8 @@
+{
+  "name": "nitro-testing",
+  "description": "Test Nitro handlers with real PostgreSQL, transaction rollback, factories",
+  "version": "1.0.0",
+  "author": {
+    "name": "yeedle"
+  }
+}
