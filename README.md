@@ -9,26 +9,18 @@ First, add the marketplace:
 /plugin marketplace add gallop-systems/claude-skills
 ```
 
-Then install all skills:
-```
-/plugin install all@gallop-systems-claude-skills
-```
-
-Or install individual skills:
+Then install the skills you want:
 ```
 /plugin install kysely-postgres@gallop-systems-claude-skills
 /plugin install nuxt-nitro-api@gallop-systems-claude-skills
 /plugin install nitro-testing@gallop-systems-claude-skills
+/plugin install linear@gallop-systems-claude-skills
+/plugin install setup-permissions@gallop-systems-claude-skills
 ```
 
 ## Updating
 
-Update all skills to the latest version:
-```
-/plugin update all@gallop-systems-claude-skills
-```
-
-Or update a specific skill:
+Update a specific skill to the latest version:
 ```
 /plugin update kysely-postgres@gallop-systems-claude-skills
 ```
@@ -83,8 +75,17 @@ Covers:
 
 ## Adding New Skills
 
-1. Create a new directory under `skills/`
-2. Add a `SKILL.md` file with frontmatter:
+1. Create a new plugin directory: `plugins/my-skill/`
+2. Add `plugins/my-skill/.claude-plugin/plugin.json`:
+   ```json
+   {
+     "name": "my-skill",
+     "description": "Short description",
+     "version": "1.0.0",
+     "author": { "name": "yeedle" }
+   }
+   ```
+3. Add `plugins/my-skill/skills/my-skill/SKILL.md` with frontmatter:
    ```yaml
    ---
    name: my-skill
@@ -93,5 +94,6 @@ Covers:
 
    # Skill content here
    ```
-3. Add any reference files in the same directory
-4. Commit and push
+4. Add any reference files alongside `SKILL.md`
+5. Register the plugin in `.claude-plugin/marketplace.json`
+6. Commit and push
