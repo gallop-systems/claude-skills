@@ -136,6 +136,30 @@ const result = await $fetch(`/api/users/${userId}`);
 // result is union of all matching routes
 ```
 
+### Static route shadowing a dynamic sibling
+
+Template-literal inference normally resolves a dynamic route fine. But adding a
+**static** route under an existing `[param]` directory makes a template-literal
+`$fetch` to the dynamic sibling ambiguous. E.g. adding
+`server/api/invoices/summary.get.ts` next to `server/api/invoices/[id].get.ts`:
+the typed-route map now matches both `/api/invoices/:id` and
+`/api/invoices/summary`, so inference can't tell which `$fetch(\`/api/invoices/${id}\`)`
+means — and typecheck fails on the existing callers.
+
+Disambiguate by casting the URL to the specific route id (NOT the response
+type — that still defeats response inference):
+
+```typescript
+// Ambiguous after adding the static `/api/invoices/summary` route:
+const invoice = await $fetch(`/api/invoices/${id}`);
+
+// RIGHT - name the route id; the response stays inferred
+const invoice = await $fetch(`/api/invoices/${id}` as "/api/invoices/:id");
+```
+
+Expect this side effect whenever you add a static endpoint beside a `[param]`
+one — you'll need to touch the existing dynamic-route callers.
+
 **Never add manual types:**
 ```typescript
 // WRONG - defeats inference
