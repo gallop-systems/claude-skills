@@ -5,7 +5,7 @@
   "license": "UNLICENSED",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gallop-systems/claude-skills.git"
+    "url": "git+https://github.com/gallop-systems/agent-skills.git"
   },
   "files": [
     "plugins",

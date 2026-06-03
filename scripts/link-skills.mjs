@@ -19,8 +19,8 @@ const PKG_DIR_REAL = realOrSelf(PKG_DIR)
 const UNLINK = process.argv.includes('--unlink')
 const SKIP_DIRS = new Set(['node_modules', '.git', '.claude'])
 
-const log = (msg) => console.log(`[claude-skills] ${msg}`)
-const warn = (msg) => console.warn(`[claude-skills] ${msg}`)
+const log = (msg) => console.log(`[agent-skills] ${msg}`)
+const warn = (msg) => console.warn(`[agent-skills] ${msg}`)
 
 function realOrSelf(p) {
   try {

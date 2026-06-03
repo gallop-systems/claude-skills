@@ -6,27 +6,27 @@ A collection of Claude Code skills.
 
 First, add the marketplace:
 ```
-/plugin marketplace add gallop-systems/claude-skills
+/plugin marketplace add gallop-systems/agent-skills
 ```
 
 Then install the skills you want:
 ```
-/plugin install kysely-postgres@gallop-systems-claude-skills
-/plugin install nuxt-nitro-api@gallop-systems-claude-skills
-/plugin install nitro-testing@gallop-systems-claude-skills
-/plugin install linear@gallop-systems-claude-skills
+/plugin install kysely-postgres@gallop-systems-agent-skills
+/plugin install nuxt-nitro-api@gallop-systems-agent-skills
+/plugin install nitro-testing@gallop-systems-agent-skills
+/plugin install linear@gallop-systems-agent-skills
 ```
 
 ## Updating
 
 Update a specific skill to the latest version:
 ```
-/plugin update kysely-postgres@gallop-systems-claude-skills
+/plugin update kysely-postgres@gallop-systems-agent-skills
 ```
 
 **Auto-updates:** Third-party marketplaces don't auto-update by default. To enable:
 1. Run `/plugin` and select **Marketplaces**
-2. Choose `gallop-systems-claude-skills`
+2. Choose `gallop-systems-agent-skills`
 3. Select **Enable auto-update**
 
 ## Install as an npm dependency (per-repo)
