@@ -158,6 +158,16 @@ Covers:
 - Releasing versions (tag + GitHub Release) and the update-checker workflow pattern
 - Applying `copier update` in descendants: conflict triage, `.rej` files, validation
 
+## Contributing a Lesson Back
+
+Every skill ends with a **Contributing Back** section: when Claude works through
+something the skill didn't cover, it offers to contribute the lesson upstream. The
+`/contribute-skill` command (shipped in this package and symlinked into
+`.claude/commands/` on install) automates the flow: distill the generic lesson,
+privacy-sweep it, clone or fork this repo, and open a PR against the right skill
+file. PRs from forks are welcome — content must be generic (placeholders only, no
+project-specific names, IDs, or domains).
+
 ## Adding New Skills
 
 1. Create a new plugin directory: `plugins/my-skill/`

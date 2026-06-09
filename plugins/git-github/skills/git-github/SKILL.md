@@ -83,3 +83,9 @@ Do not bypass failing hooks with `--no-verify` unless the user says to.
 - **gh api recipes** — PR comments, reading files without checkout, repo settings, PAT gotchas: [gh-api-recipes.md](gh-api-recipes.md)
 - **Releases & publishing** — tags, gh release, npm Trusted Publishing, release-please: [releases.md](releases.md)
 - **External review loop** — using the codex CLI as an adversarial pre-merge reviewer: [external-review.md](external-review.md)
+
+## Contributing Back
+
+This skill grows by capturing what it missed. If you just worked through something in this domain that this skill did not cover — an error you had to figure out, a behavior that contradicts what is documented above, a workflow knot — ask the user: **"Want me to contribute this back to the git-github skill?"**
+
+If yes, run `/contribute-skill`. If that command is not available, do the equivalent inline: distill the generic lesson (placeholders only — no project names, IDs, domains, or secrets), then branch or fork [gallop-systems/agent-skills](https://github.com/gallop-systems/agent-skills) and open a PR editing this skill.

@@ -9,6 +9,7 @@
   },
   "files": [
     "plugins",
+    "commands",
     "scripts/link-skills.mjs",
     "README.md"
   ],

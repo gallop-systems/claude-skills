@@ -1038,3 +1038,9 @@ node linear.mjs rebalance
 4. **Don't overcommit cycles.** Leave ~20% buffer for bugs, client requests, and interruptions.
 5. **Projects identify the client.** No need for client prefixes in issue titles or client labels — the project name (e.g., `[GBX] Portal`) already provides that context.
 6. **Triage first.** New client requests go to Backlog, not straight into the sprint — unless truly urgent.
+
+## Contributing Back
+
+This skill grows by capturing what it missed. If you just worked through something in this domain that this skill did not cover — an error you had to figure out, a behavior that contradicts what is documented above, a workflow knot — ask the user: **"Want me to contribute this back to the linear skill?"**
+
+If yes, run `/contribute-skill`. If that command is not available, do the equivalent inline: distill the generic lesson (placeholders only — no project names, IDs, domains, or secrets), then branch or fork [gallop-systems/agent-skills](https://github.com/gallop-systems/agent-skills) and open a PR editing this skill.
