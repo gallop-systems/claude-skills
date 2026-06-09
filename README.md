@@ -15,6 +15,9 @@ Then install the skills you want:
 /plugin install nuxt-nitro-api@gallop-systems-agent-skills
 /plugin install nitro-testing@gallop-systems-agent-skills
 /plugin install linear@gallop-systems-agent-skills
+/plugin install doctl@gallop-systems-agent-skills
+/plugin install git-github@gallop-systems-agent-skills
+/plugin install copier-template@gallop-systems-agent-skills
 ```
 
 ## Updating
@@ -110,6 +113,50 @@ Covers:
 - Global stubs for Nuxt auto-imports
 - Async/automation testing utilities
 - CI/CD setup with GitHub Actions and PostgreSQL
+
+### linear
+
+Create, triage, and manage Linear issues following team conventions, with a GraphQL CLI for operations the Linear MCP server doesn't expose.
+
+Covers:
+- Issue creation and triage conventions
+- Tech-stack labels
+- A `linear.mjs` CLI for GraphQL operations
+
+### doctl
+
+Manage DigitalOcean resources with the doctl CLI.
+
+Covers:
+- Auth contexts (per-command `--context` over stateful switching)
+- Resolving the current git repo to its DO context + app
+- App Platform: deployments, bounded polling, logs and their retention quirks
+- App specs: env var/secret round-trips, validation, creating apps
+- `--format` / `-o json` gotchas
+- Managed databases, Spaces keys, droplets, DNS
+
+### git-github
+
+Git and GitHub (gh CLI) workflows for agents.
+
+Covers:
+- Ground rules and the branch → commit → PR loop
+- Reading PR and CI state (`gh pr view --json`, `gh pr checks`)
+- Debugging failed GitHub Actions runs (the full playbook)
+- Repair ladders: rejected pushes, rebase-after-squash-merge, shallow clones, worktrees
+- `gh api` recipes: PR comments, no-checkout file reads, repo settings, PAT gotchas
+- Releases: tags, npm Trusted Publishing, release-please
+- External review loop with the codex CLI
+
+### copier-template
+
+Maintain a Copier project template and propagate updates to generated repos.
+
+Covers:
+- Template anatomy: copier.yml, conditional files, tasks, jinja escaping in CI workflows
+- Testing template changes (`--vcs-ref HEAD`, generate-and-validate)
+- Releasing versions (tag + GitHub Release) and the update-checker workflow pattern
+- Applying `copier update` in descendants: conflict triage, `.rej` files, validation
 
 ## Adding New Skills
 
