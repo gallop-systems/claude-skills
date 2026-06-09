@@ -1,0 +1,8 @@
+{
+  "name": "git-github",
+  "description": "Git and GitHub (gh CLI) workflows for agents: the branch-to-PR loop, reading PR/CI state, debugging failed Actions runs, repair ladders for stuck git states, gh api recipes, and release flows.",
+  "version": "1.0.0",
+  "author": {
+    "name": "yeedle"
+  }
+}

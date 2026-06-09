@@ -1,0 +1,8 @@
+{
+  "name": "copier-template",
+  "description": "Maintain a Copier project template and propagate updates to generated repos: template anatomy, testing changes, releasing versions, and applying copier update in descendants with conflict resolution.",
+  "version": "1.0.0",
+  "author": {
+    "name": "yeedle"
+  }
+}
