@@ -1,7 +1,7 @@
 {
   "name": "doctl",
-  "description": "Manage DigitalOcean App Platform deployments with the doctl CLI: auth contexts, listing apps, monitoring deployments, and checking logs.",
-  "version": "1.0.0",
+  "description": "Manage DigitalOcean resources with the doctl CLI: auth contexts, App Platform deployments and logs, app specs and secrets, repo-to-app resolution, databases, Spaces, and droplets.",
+  "version": "1.1.0",
   "author": {
     "name": "yeedle"
   }

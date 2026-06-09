@@ -32,7 +32,19 @@
     {
       "name": "doctl",
       "source": "./plugins/doctl",
-      "description": "Manage DigitalOcean App Platform deployments with the doctl CLI: auth contexts, listing apps, monitoring deployments, and checking logs",
+      "description": "Manage DigitalOcean resources with the doctl CLI: auth contexts, App Platform deployments and logs, app specs and secrets, repo-to-app resolution, databases, Spaces, and droplets",
+      "version": "1.1.0"
+    },
+    {
+      "name": "git-github",
+      "source": "./plugins/git-github",
+      "description": "Git and GitHub (gh CLI) workflows for agents: the branch-to-PR loop, PR/CI state, debugging failed Actions runs, repair ladders for stuck git states, gh api recipes, and release flows",
+      "version": "1.0.0"
+    },
+    {
+      "name": "copier-template",
+      "source": "./plugins/copier-template",
+      "description": "Maintain a Copier project template and propagate updates to generated repos: template anatomy, testing changes, releasing versions, and applying copier update with conflict resolution",
       "version": "1.0.0"
     }
   ]

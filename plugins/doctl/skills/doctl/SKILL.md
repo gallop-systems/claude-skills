@@ -1,93 +1,119 @@
 ---
 name: doctl
-description: Manage DigitalOcean App Platform deployments with doctl CLI. Covers auth contexts, listing apps, monitoring deployments, and checking logs.
+description: Manage DigitalOcean resources with the doctl CLI. Covers auth contexts, App Platform (deployments, logs, env vars/secrets via app specs), mapping a git repo to its app, managed databases, Spaces keys, and droplets.
 ---
 
 # DigitalOcean doctl CLI Patterns
 
-This skill provides patterns for managing DigitalOcean resources via the `doctl` CLI, focused on App Platform.
+Patterns for managing DigitalOcean resources via the `doctl` CLI, centered on App Platform.
 
 ## When to Use This Skill
 
 Use this skill when:
 - Deploying or monitoring apps on DigitalOcean App Platform
-- Switching between DigitalOcean auth contexts
-- Checking deployment status or logs
-- Listing apps and their deployments
+- Checking deployment status, build failures, or runtime logs
+- Adding/changing env vars or secrets on a deployed app
+- Working with managed databases, Spaces, or droplets
+- Figuring out which DO account/app corresponds to the current repo
 
 ## Auth Contexts
 
 doctl supports named auth contexts for managing multiple accounts/teams.
 
 ```bash
-# Switch to a named context
-doctl auth switch --context <context-name>
-
-# List available contexts
-doctl auth list
+doctl auth list                          # list contexts; (current) marks the active one
+doctl account get --context <name>       # cheap probe: is this context valid, which account is it?
 ```
 
-Always switch context before running commands against a specific account.
-
-## App Platform
-
-### Listing Apps
+**Prefer the `--context` flag over switching.** Every doctl command accepts `--context <name>` (before or after the subcommand). This targets one account for one command without mutating global state — important when a session touches multiple accounts:
 
 ```bash
-# List all apps (shows ID, name, ingress URL, deployment status)
-doctl apps list
+doctl apps list --context <ctx>
+for ctx in $(doctl auth list); do doctl apps list --context "$ctx"; done
 ```
 
-Key columns: `ID`, `Spec Name`, `Default Ingress`, `Active Deployment ID`, `In Progress Deployment ID`.
+Only use `doctl auth switch --context <name>` when the user explicitly wants the default changed.
 
-The app ID is a UUID — you'll need it for all subsequent commands.
+**`doctl auth init --context <name>` is interactive** (it prompts for a pasted token) — an agent cannot complete it. Ask the user to run it themselves.
 
-### Monitoring Deployments
+## Resolving the Current Repo to a Context + App
+
+App specs embed their source repo, so "check prod logs" is answerable from inside any repo:
 
 ```bash
-# List recent deployments for an app
-doctl apps list-deployments <app-id>
+repo=$(git remote get-url origin | sed -E 's#.*github.com[:/]##; s#\.git$##')
+for ctx in $(doctl auth list); do
+  doctl apps list --context "$ctx" -o json 2>/dev/null | jq -r --arg ctx "$ctx" --arg repo "$repo" \
+    '.[] | select([.spec.services[]?, .spec.static_sites[]?, .spec.workers[]?, .spec.jobs[]?]
+      | any(.github.repo == $repo)) | "\($ctx)\t\(.spec.name)\t\(.id)"'
+done
 ```
 
-Key columns: `ID`, `Cause`, `Progress` (e.g. `6/6`), `Phase`.
+This costs one API call per context — resolve once per session and reuse the `(context, app-id)` pair. If a repo backs multiple apps (e.g. staging + prod, or one repo deployed to several accounts), list the matches and ask the user which one they mean. Apps deployed without a git source won't be found this way.
 
-Deployment phases:
-- `PENDING_BUILD` — queued
-- `BUILDING` — build in progress
-- `DEPLOYING` — deploying built artifacts
-- `ACTIVE` — successfully deployed and serving traffic
-- `SUPERSEDED` — replaced by a newer deployment
-- `ERROR` — deployment failed
-
-The `Cause` column shows which commit triggered the deploy.
-
-### Deployment Logs
+## App Platform Basics
 
 ```bash
-# Get build logs for a specific deployment
-doctl apps logs <app-id> --deployment <deployment-id> --type build
-
-# Get runtime logs
-doctl apps logs <app-id> --type run
-
-# Follow logs in real-time
-doctl apps logs <app-id> --type run --follow
+doctl apps list --context <ctx>                    # ID, Spec.Name, DefaultIngress, deployment IDs
+doctl apps list-deployments <app-id>               # recent deployments: ID, Cause, Progress, Phase
+doctl apps get <app-id> --format DefaultIngress,ActiveDeployment.Phase,InProgressDeployment.ID
+doctl apps list-domains <app-id>                   # custom domains (there is no Domains column)
 ```
 
-Log types: `build`, `deploy`, `run`, `run_restarted`.
+Most commands require the app UUID, not the name — get it from `doctl apps list`.
 
-### Getting App Details
+The `Cause` column tells you *why* a deployment happened: `commit <sha> pushed to <repo>` for git pushes vs `app spec updated` for config changes.
+
+Deployment phases: `PENDING_BUILD` → `BUILDING` → `DEPLOYING` → `ACTIVE`. Terminal failure states: `ERROR`, `CANCELED`. `SUPERSEDED` means replaced by a newer deployment.
+
+### Deploying
+
+Apps connected to GitHub auto-deploy on push to the configured branch. To redeploy without a code change (config refresh, transient build failure):
 
 ```bash
-# Get full app spec (useful for seeing components, env vars, routes)
-doctl apps get <app-id>
-
-# Get app spec as yaml
-doctl apps spec get <app-id>
+doctl apps create-deployment <app-id> --format ID,Phase
 ```
 
-## Common Gotchas
+### Waiting for a deployment
 
-- **Column names in `--format`**: doctl's `--format` flag is picky about column names. If you get `unknown column` errors, run the command without `--format` first to see available columns, then filter with standard tools like `head`.
-- **Deployment auto-trigger**: Apps connected to GitHub auto-deploy on push to the configured branch. No manual deploy needed unless auto-deploy is off.
-- **App ID vs Name**: Most commands require the app UUID, not the human-readable name. Get it from `doctl apps list`.
+Poll bounded, with a fixed or escalating interval — never an unbounded `--follow`/watch in an agent context:
+
+```bash
+for i in $(seq 1 90); do
+  PHASE=$(doctl apps get-deployment <app-id> <deployment-id> --format Phase --no-header | tr -d ' ')
+  case "$PHASE" in
+    ACTIVE) echo deployed; break;;
+    ERROR|CANCELED|SUPERSEDED) echo "failed: $PHASE"; exit 1;;
+  esac
+  sleep 20
+done
+```
+
+## Logs
+
+```bash
+doctl apps logs <app-id> --type run --tail 500          # bounded runtime logs
+doctl apps logs <app-id> <component> --type build       # component is a POSITIONAL arg, not a flag
+doctl apps logs <app-id> --type run --follow            # live tail (interactive use only)
+```
+
+- Log types: `build`, `deploy`, `run` (default). There is no `--component` flag — pass the component name as the second positional argument.
+- Always use `--tail N` and grep (`| grep -iE 'error|timeout|oom'`) rather than dumping everything — run logs can contain live secrets.
+- **Logs rotate on each deployment and retention is short.** Yesterday's crash logs are usually gone after today's deploy (unless log forwarding is configured). Capture logs immediately after triggering the thing you're observing.
+- Run logs are only retrievable from the **active** deployment — `--deployment <old-id> --type run` fails with a 400 (`phase final_cleanup`). Build logs of older deployments are fine.
+- A brand-new app has no logs until its first deployment starts (`no deployment found for app`).
+- To tell a crash-restart from a deploy-restart, compare timestamps against `list-deployments` Created times.
+
+## Output Formats: `--format`, `-o json`
+
+- **Column names differ per subcommand** and doctl version. `apps list --format ActiveDeployment.Phase` fails (`unknown column`) — but the same column works on `apps get`. Nested names use dots (`Spec.Name`, not `SpecName`). On `unknown column`, fall back to `-o json | jq` rather than guessing.
+- **`-o json` returns an array even for a single resource** — use `.[0].spec...`, not `.spec...`.
+- **`apps spec get` always emits YAML** — it silently ignores `-o json`. Don't pipe it to a JSON parser.
+- **A bad `--format` on a mutating command does NOT roll back the mutation.** `doctl apps update ... --format BadColumn` applies the update, then errors. Do not re-run the command — verify state instead.
+- Empty fields render as the literal string `<nil>`; `--no-header` keeps column padding — `tr -d ' '` before string-comparing.
+- `--http-retry-max` (global flag) auto-retries 429/5xx responses.
+
+## Further Reading
+
+- **App specs — env vars, secrets, creating apps**: see [spec-management.md](spec-management.md)
+- **Databases, Spaces, droplets, DNS**: see [other-services.md](other-services.md)
