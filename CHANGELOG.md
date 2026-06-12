@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/gallop-systems/agent-skills/compare/agent-skills-v1.3.0...agent-skills-v1.4.0) (2026-06-12)
+
+
+### Features
+
+* **nuxt-nitro-api:** add formatters reference ([#15](https://github.com/gallop-systems/agent-skills/issues/15)) ([4e59f2c](https://github.com/gallop-systems/agent-skills/commit/4e59f2cc907d1121baf39bb044fb3aef5ba8fa79))
+
 ## [1.3.0](https://github.com/gallop-systems/agent-skills/compare/agent-skills-v1.2.0...agent-skills-v1.3.0) (2026-06-09)
 
 
