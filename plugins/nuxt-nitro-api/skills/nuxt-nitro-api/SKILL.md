@@ -25,6 +25,7 @@ For detailed patterns, see these topic-focused reference files:
 - [auth-patterns.md](./auth-patterns.md) - nuxt-auth-utils, OAuth, WebAuthn, middleware
 - [page-structure.md](./page-structure.md) - Keep pages thin, components do the work
 - [composables-utils.md](./composables-utils.md) - When to use composables vs utils
+- [formatters.md](./formatters.md) - Centralize currency/date/number formatters in useFormatters, never inline
 - [ssr-client.md](./ssr-client.md) - SSR + localStorage, hydration, VueUse
 - [deep-linking.md](./deep-linking.md) - URL params sync with filters and useFetch
 - [nitro-tasks.md](./nitro-tasks.md) - Background jobs, scheduled tasks, job queues

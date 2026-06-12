@@ -79,6 +79,11 @@ export const usePermissions = () => {
 - Data transformations, formatting, parsing
 - NO `use` prefix
 
+> **Formatters belong in one shared place.** The examples below show util *placement*,
+> not where to call formatters from. Never define a currency/date/number formatter inline
+> at the call site — centralize them in `useFormatters` or a shared util, and prefer
+> VueUse / date-fns over hand-rolling. See [formatters.md](./formatters.md).
+
 ```typescript
 // utils/formatting.ts
 export const formatDate = (date: string) => {
